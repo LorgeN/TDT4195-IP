@@ -32,7 +32,7 @@ def convolve_im(
 
     # Recreate an array padded with 0s so we dont have to worry about index out
     # of bounds at later stages
-    src = np.zeros(np.array([H + k, W + k, c]))
+    src = np.zeros(im.shape + np.array([k, k, 0]))
     # Copy the image given as input into the center of our padded array
     src[k2 : (H + k2), k2 : (W + k2), :] = im
 
