@@ -3,10 +3,23 @@ import numpy as np
 import skimage
 import utils
 
+idx = 1
+
+
+def magnitude(fft_im):
+    real = fft_im.real
+    imag = fft_im.imag
+    return np.sqrt(real ** 2 + imag ** 2)
+
+
+def to_image(obj):
+    return np.log(magnitude(obj) + 1)
+
 
 def convolve_im(im: np.array,
                 kernel: np.array,
                 verbose=True):
+    global idx
     """ Convolves the image (im) with the spatial kernel (kernel),
         and returns the resulting image.
 
@@ -22,11 +35,19 @@ def convolve_im(im: np.array,
     Returns:
         im: np.array of shape [H, W]
     """
-    # START YOUR CODE HERE ### (You can change anything inside this block)
+    kernel_pad = np.pad(kernel, [(0, im.shape[i] - kernel.shape[i]) for i in range(2)])
 
-    conv_result = im
+    fft_kernel = np.fft.fft2(kernel_pad)
 
+    fft_im = np.fft.fft2(im)
+    filtered = fft_im * fft_kernel
+
+    conv_result = np.fft.ifft2(filtered).real
     if verbose:
+        vis_fft_im = np.fft.fftshift(fft_im)
+        vis_fft_kernel = np.fft.fftshift(fft_kernel)
+        vis_filtered = np.fft.fftshift(filtered)
+
         # Use plt.subplot to place two or more images beside eachother
         plt.figure(figsize=(20, 4))
         # plt.subplot(num_rows, num_cols, position (1-indexed))
@@ -34,15 +55,19 @@ def convolve_im(im: np.array,
         plt.imshow(im, cmap="gray")
         plt.subplot(1, 5, 2)
         # Visualize FFT
+        plt.imshow(to_image(vis_fft_im), cmap="gray")
         plt.subplot(1, 5, 3)
         # Visualize FFT kernel
+        plt.imshow(to_image(vis_fft_kernel), cmap="gray")
         plt.subplot(1, 5, 4)
         # Visualize filtered FFT image
+        plt.imshow(to_image(vis_filtered), cmap="gray")
         plt.subplot(1, 5, 5)
         # Visualize filtered spatial image
         plt.imshow(conv_result, cmap="gray")
+        plt.savefig(utils.image_output_dir.joinpath(f"task4b_{idx}.png"))
+        idx += 1
 
-    ### END YOUR CODE HERE ###
     return conv_result
 
 

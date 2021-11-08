@@ -28,6 +28,16 @@ def create_binary_image(im):
 
     # START YOUR CODE HERE ### (You can change anything inside this block)
     binary_im = np.zeros_like(im, dtype=np.bool)
+
+    fft_im = np.fft.fft2(im)
+    fft_im = np.fft.fftshift(fft_im)
+    fft_im = utils.normalize(np.log(np.absolute(fft_im) + 1))
+
+    for x in range(fft_im.shape[0]):
+        for y in range(fft_im.shape[1]):
+            if np.absolute(fft_im[x, y]) > 0.5:
+                binary_im[x, y] = 1
+
     ### END YOUR CODE HERE ###
     return binary_im
 

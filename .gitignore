@@ -3,4 +3,6 @@ venv
 env
 __pycache__
 image_solutions
+image_processed
 data
+*.zip

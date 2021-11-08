@@ -1,10 +1,9 @@
-
-
 import matplotlib.pyplot as plt
 from PIL import Image
 import torchvision
 import torch
 import numpy as np
+import utils
 
 
 image = Image.open("images/zebra.jpg")
@@ -26,12 +25,13 @@ print("First conv layer:", first_conv_layer)
 
 
 # We need to resize, and normalize the image with the mean and standard deviation that they used to originally train this network.
-image_transform = torchvision.transforms.Compose([
-    torchvision.transforms.Resize((224, 224)),
-    torchvision.transforms.ToTensor(),
-    torchvision.transforms.Normalize(
-        [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
+image_transform = torchvision.transforms.Compose(
+    [
+        torchvision.transforms.Resize((224, 224)),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]
+)
 
 
 # Apply the image transform to the zebra image
@@ -50,9 +50,9 @@ print("Filter/Weight/kernel size:", weight.shape)
 
 def torch_image_to_numpy(image: torch.Tensor):
     """
-        We've created a function `torch_image_to_numpy` to help you out.
-        This function transforms an torch tensor with shape (batch size, num channels, height, width) to
-        (batch size, height, width, num channels) numpy array
+    We've created a function `torch_image_to_numpy` to help you out.
+    This function transforms an torch tensor with shape (batch size, num channels, height, width) to
+    (batch size, height, width, num channels) numpy array
     """
     # Normalize to [0 - 1.0]
     image = image.detach().cpu()  # Transform image to CPU memory (if on GPU VRAM)
@@ -61,8 +61,9 @@ def torch_image_to_numpy(image: torch.Tensor):
     image = image.numpy()
     if len(image.shape) == 2:  # Grayscale image, can just return
         return image
-    assert image.shape[0] == 3, "Expected color channel to be on first axis. Got: {}".format(
-        image.shape)
+    assert (
+        image.shape[0] == 3
+    ), "Expected color channel to be on first axis. Got: {}".format(image.shape)
     image = np.moveaxis(image, 0, 2)
     return image
 
@@ -72,13 +73,16 @@ def torch_image_to_numpy(image: torch.Tensor):
 # Tip: test out for indices = [01,2,3,4,5] to check that your result is correct!
 indices = [5, 8, 19, 22, 34]
 num_filters = len(indices)
-# %%
 plt.figure(figsize=(20, 4))
-n = 1
-for i in indices:
-    plt.subplot(2, num_filters, n)
+for n, i in enumerate(indices):
+    plt.subplot(2, num_filters, n + 1)
     # Plot weight here
-    plt.subplot(2, num_filters, num_filters+n)
+    plt.imshow(torch_image_to_numpy(weight[i]))
+
+    plt.subplot(2, num_filters, num_filters + n + 1)
     # Plot activation here
-    n += 1
+    plt.imshow(torch_image_to_numpy(activation[0, i]), cmap="gray")
+
+plt.savefig(utils.image_output_dir.joinpath("task2c.png"))
+plt.show()
 ### END YOUR CODE HERE ###
