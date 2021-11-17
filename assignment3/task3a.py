@@ -14,6 +14,8 @@ def remove_noise(im: np.ndarray) -> np.ndarray:
     """
     # START YOUR CODE HERE ### (You can change anything inside this block)
     # You can also define other helper functions
+    im = skimage.morphology.binary_opening(im, np.ones((13, 13)))
+    im = skimage.morphology.binary_closing(im, np.ones((10, 10)))
     return im
     ### END YOUR CODE HERE ###
 
